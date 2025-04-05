@@ -14,13 +14,42 @@ require(['vs/editor/editor.main'], function() {
         value: '// Write your code here\n',
         language: 'javascript',
         theme: 'vs-dark',
-        automaticLayout: true
+        automaticLayout: true,
+        minimap: { enabled: true },
+        fontSize: 14,
+        tabSize: 4,
+        formatOnType: true,
+        formatOnPaste: true,
+        snippetSuggestions: 'inline',
+        suggestOnTriggerCharacters: true,
+        folding: true,
+        contextmenu: true,
+        mouseWheelZoom: true,
+        padding: { top: 10 }
+    });
+
+    // Add code snippets
+    monaco.languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems: () => {
+            return {
+                suggestions: [
+                    {
+                        label: 'for',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {\n\t${3}\n}',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    },
+                    // Add more snippets here
+                ]
+            };
+        }
     });
 
     // Initialize first tab
     fileManager.createTab();
 
     setupEventListeners();
+    setupCommands();
 
     const previewBtn = document.getElementById('preview-btn');
     const languageSelect = document.getElementById('language-select');
@@ -47,6 +76,21 @@ require(['vs/editor/editor.main'], function() {
     });
 });
 
+function setupCommands() {
+    // Add keyboard shortcuts
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => {
+        editor.getAction('actions.find').run();
+    });
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyH, () => {
+        editor.getAction('actions.replace').run();
+    });
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+        fileManager.saveFile();
+    });
+}
+
 function setupEventListeners() {
     document.getElementById('new-file').addEventListener('click', () => {
         fileManager.createTab();
@@ -72,6 +116,47 @@ function setupEventListeners() {
     });
 
     document.getElementById('run-btn').addEventListener('click', executeCode);
+
+    document.getElementById('format-btn').addEventListener('click', () => {
+        editor.getAction('editor.action.formatDocument').run();
+    });
+
+    document.getElementById('fold-btn').addEventListener('click', () => {
+        editor.getAction('editor.foldAll').run();
+    });
+
+    document.getElementById('minimap-btn').addEventListener('click', () => {
+        const minimapEnabled = !editor.getOption(monaco.editor.EditorOption.minimap).enabled;
+        editor.updateOptions({ minimap: { enabled: minimapEnabled } });
+    });
+
+    // Panel tabs
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.target;
+            document.querySelectorAll('.panel-content').forEach(panel => {
+                panel.style.display = 'none';
+            });
+            document.getElementById(target).style.display = 'block';
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Settings
+    document.getElementById('settings-btn').addEventListener('click', () => {
+        document.getElementById('settings-modal').style.display = 'block';
+    });
+
+    // Theme change
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+        monaco.editor.setTheme(e.target.value);
+    });
+
+    // Font size change
+    document.getElementById('font-size').addEventListener('change', (e) => {
+        editor.updateOptions({ fontSize: parseInt(e.target.value) });
+    });
 }
 
 async function executeCode() {

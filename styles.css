@@ -97,3 +97,93 @@ body {
 .preview-panel h3 { font-size: 1.17em; margin: 0.83em 0; }
 .preview-panel code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
 .preview-panel pre { background: #f4f4f4; padding: 15px; border-radius: 5px; }
+
+.sidebar {
+    width: 50px;
+    background: #2d2d2d;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.toolbar-right {
+    margin-left: auto;
+}
+
+.bottom-panel {
+    height: 200px;
+    background: #1e1e1e;
+    border-top: 1px solid #404040;
+}
+
+.panel-tabs {
+    display: flex;
+    background: #2d2d2d;
+}
+
+.panel-tab {
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.panel-tab.active {
+    background: #1e1e1e;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background: #2d2d2d;
+    margin: 15% auto;
+    padding: 20px;
+    width: 50%;
+    color: #fff;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.setting-item input,
+.setting-item select {
+    padding: 5px;
+    background: #404040;
+    border: 1px solid #555;
+    color: #fff;
+}
