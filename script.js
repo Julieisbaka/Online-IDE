@@ -1,4 +1,8 @@
-require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
+require.config({
+    paths: {
+        vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs'
+    }
+});
 
 class IDEController {
     constructor() {
@@ -22,11 +26,43 @@ class IDEController {
             language: 'javascript',
             theme: 'vs-dark',
             automaticLayout: true,
+            fontSize: 14,
+            lineNumbers: 'on',
             minimap: { enabled: true },
-            fontSize: 14
+            scrollBeyondLastLine: false,
+            roundedSelection: false,
+            readOnly: false,
+            cursorStyle: 'line',
+            automaticLayout: true,
+            wordWrap: 'on',
+            lineHeight: 20,
+            formatOnType: true,
+            formatOnPaste: true,
+            tabSize: 4,
+            insertSpaces: true,
+            detectIndentation: true,
+            quickSuggestions: true,
+            scrollbar: {
+                vertical: 'visible',
+                horizontal: 'visible',
+                useShadows: false,
+                verticalHasArrows: false,
+                horizontalHasArrows: false
+            }
         });
 
-        window.editor = this.editor; // Make editor globally accessible
+        // Make editor globally accessible
+        window.editor = this.editor;
+
+        // Add resize handler
+        window.addEventListener('resize', () => {
+            this.editor.layout();
+        });
+
+        // Initialize language features
+        if (window.languageServer) {
+            window.languageServer.initializeProviders();
+        }
     }
 
     initEventListeners() {
