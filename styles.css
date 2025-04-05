@@ -5,6 +5,16 @@
     --border-color: #404040;
     --text-color: #d4d4d4;
     --panel-height: 200px;
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #333333;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --accent-color: #0066cc;
+    --border-color: #454545;
+    --error-color: #f44336;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
 }
 
 body {
@@ -93,6 +103,8 @@ body {
     gap: 1px;
     background: var(--primary-bg);
     animation: fadeIn 0.3s ease;
+    height: calc(100vh - 120px);
+    position: relative;
 }
 
 .preview-panel {
@@ -155,6 +167,10 @@ body {
     height: var(--panel-height);
     background: var(--primary-bg);
     border-top: 1px solid var(--border-color);
+    height: 200px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    position: relative;
 }
 
 .panel-tabs {
@@ -381,4 +397,31 @@ body {
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     padding: 8px;
+}
+
+.panel-handle {
+    height: 4px;
+    background: var(--border-color);
+    cursor: ns-resize;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    padding: 16px;
+}
+
+.tools-grid button {
+    padding: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
 }

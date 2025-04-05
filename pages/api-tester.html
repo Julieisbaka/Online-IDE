@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Tester - Online IDE</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="api-tester-container">
+        <div class="request-panel">
+            <div class="url-bar">
+                <select id="http-method">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+                <input type="text" id="request-url" placeholder="Enter URL" />
+                <button id="send-request">Send</button>
+                <button id="save-request">Save</button>
+            </div>
+            
+            <div class="request-tabs">
+                <button class="tab-btn active" data-tab="params">Params</button>
+                <button class="tab-btn" data-tab="headers">Headers</button>
+                <button class="tab-btn" data-tab="body">Body</button>
+                <button class="tab-btn" data-tab="auth">Auth</button>
+            </div>
+
+            <div class="tab-content">
+                <div id="params" class="tab-pane active">
+                    <div class="param-list">
+                        <div class="param-row">
+                            <input type="text" placeholder="Key" />
+                            <input type="text" placeholder="Value" />
+                            <button class="add-param">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="headers" class="tab-pane">
+                    <div class="header-list">
+                        <div class="header-row">
+                            <input type="text" placeholder="Header" />
+                            <input type="text" placeholder="Value" />
+                            <button class="add-header">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="body" class="tab-pane">
+                    <select id="body-type">
+                        <option value="none">none</option>
+                        <option value="json">JSON</option>
+                        <option value="form">Form Data</option>
+                        <option value="raw">Raw</option>
+                    </select>
+                    <div id="body-editor"></div>
+                </div>
+
+                <div id="auth" class="tab-pane">
+                    <select id="auth-type">
+                        <option value="none">No Auth</option>
+                        <option value="basic">Basic Auth</option>
+                        <option value="bearer">Bearer Token</option>
+                    </select>
+                    <div id="auth-form"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="response-panel">
+            <div class="response-info">
+                <span id="status"></span>
+                <span id="time"></span>
+                <span id="size"></span>
+            </div>
+            <div class="response-tabs">
+                <button class="tab-btn active" data-tab="response">Response</button>
+                <button class="tab-btn" data-tab="headers">Headers</button>
+                <button class="tab-btn" data-tab="cookies">Cookies</button>
+            </div>
+            <div id="response-content"></div>
+        </div>
+
+        <div class="history-panel">
+            <h3>History</h3>
+            <div id="request-history"></div>
+        </div>
+    </div>
+    <script src="../services/apiTester.js"></script>
+    <script src="api-tester.js"></script>
+</body>
+</html>

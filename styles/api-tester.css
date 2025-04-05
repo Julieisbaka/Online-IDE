@@ -1,0 +1,73 @@
+.api-tester-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 16px;
+    padding: 16px;
+    height: 100vh;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.url-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.url-bar input {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-color);
+}
+
+.tab-pane {
+    display: none;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.history-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-item:hover {
+    background: var(--bg-secondary);
+}
+
+.method {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.method.get { background: #4caf50; }
+.method.post { background: #2196f3; }
+.method.put { background: #ff9800; }
+.method.delete { background: #f44336; }
