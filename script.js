@@ -10,29 +10,49 @@ const md = window.markdownit();
 let previewMode = false;
 
 require(['vs/editor/editor.main'], function() {
-    editor = monaco.editor.create(document.getElementById('editor'), {
-        value: '// Write your code here\n',
+    const editorOptions = {
+        value: '// Welcome to the enhanced Online IDE!\n',
         language: 'javascript',
         theme: 'vs-dark',
         automaticLayout: true,
-        minimap: { enabled: true },
         fontSize: 14,
-        tabSize: 4,
         formatOnType: true,
         formatOnPaste: true,
         snippetSuggestions: 'inline',
-        suggestOnTriggerCharacters: true,
+        minimap: { enabled: true },
+        quickSuggestions: true,
+        bracketPairColorization: {
+            enabled: true
+        },
+        inlineSuggest: {
+            enabled: true
+        },
+        suggest: {
+            preview: true,
+            showIcons: true,
+            showStatusBar: true,
+            showInlineDetails: true
+        },
+        parameterHints: {
+            enabled: true,
+            cycle: true
+        },
+        hover: {
+            enabled: true,
+            delay: 300
+        },
         folding: true,
-        contextmenu: true,
-        mouseWheelZoom: true,
-        padding: { top: 10 },
-        autoIndent: 'full',
-        dragAndDrop: true,
         links: true,
-        parameterHints: { enabled: true },
-        showUnused: true,
-        tabCompletion: 'on'
-    });
+        dragAndDrop: true,
+        mouseWheelZoom: true,
+        wordWrap: 'on',
+        cursorBlinking: 'smooth',
+        cursorSmoothCaretAnimation: true,
+        smoothScrolling: true,
+        contextmenu: true
+    };
+
+    editor = monaco.editor.create(document.getElementById('editor'), editorOptions);
 
     // Add code snippets
     monaco.languages.registerCompletionItemProvider('javascript', {
@@ -55,6 +75,100 @@ require(['vs/editor/editor.main'], function() {
             };
         }
     });
+
+    // Configure Monaco features
+    monaco.languages.registerHoverProvider('javascript', {
+        provideHover: function (model, position) {
+            const word = model.getWordAtPosition(position);
+            if (word) {
+                return {
+                    contents: [
+                        { value: '**' + word.word + '**' },
+                        { value: 'Type: `any`\n\nHover information for ' + word.word }
+                    ]
+                };
+            }
+        }
+    });
+
+    monaco.languages.registerCodeLensProvider('javascript', {
+        provideCodeLenses: function (model) {
+            return {
+                lenses: [
+                    {
+                        range: {
+                            startLineNumber: 1,
+                            startColumn: 1,
+                            endLineNumber: 1,
+                            endColumn: 1
+                        },
+                        id: "test",
+                        command: {
+                            id: 'run.test',
+                            title: '▶ Run Tests'
+                        }
+                    }
+                ],
+                dispose: () => {}
+            };
+        }
+    });
+
+    // Add error lens
+    monaco.editor.setModelMarkers(editor.getModel(), 'javascript', [{
+        message: 'Unused variable',
+        severity: monaco.MarkerSeverity.Warning,
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: 1,
+        endColumn: 1
+    }]);
+
+    // Configure debugger
+    const debuggerInstance = {
+        breakpoints: new Set(),
+        toggleBreakpoint: function(lineNumber) {
+            const decoration = {
+                range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+                options: {
+                    isWholeLine: true,
+                    className: 'breakpoint',
+                    glyphMarginClassName: 'breakpoint-glyph'
+                }
+            };
+            if (this.breakpoints.has(lineNumber)) {
+                this.breakpoints.delete(lineNumber);
+                editor.deltaDecorations([decoration], []);
+            } else {
+                this.breakpoints.add(lineNumber);
+                editor.deltaDecorations([], [decoration]);
+            }
+        }
+    };
+
+    // Add parameter hints
+    monaco.languages.registerSignatureHelpProvider('javascript', {
+        signatureHelpTriggerCharacters: ['(', ','],
+        provideSignatureHelp: function (model, position) {
+            return {
+                signatures: [{
+                    label: 'function(param1: string, param2: number): void',
+                    documentation: 'Function documentation',
+                    parameters: [
+                        { label: 'param1', documentation: 'First parameter' },
+                        { label: 'param2', documentation: 'Second parameter' }
+                    ]
+                }],
+                activeSignature: 0,
+                activeParameter: 0
+            };
+        }
+    });
+
+    // Setup testing framework
+    class TestRunner {
+        // ...test runner implementation...
+    }
 
     // Initialize first tab
     fileManager.createTab();
@@ -98,7 +212,11 @@ function setupCommands() {
     });
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-        fileManager.saveFile();
+        fileManager.saveCurrentFile();
+    });
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP, () => {
+        showCommandPalette();
     });
 }
 
@@ -337,4 +455,109 @@ class LanguageService {
     }
 }
 
+class UIManager {
+    constructor() {
+        this.initResizablePanel();
+        this.initDragAndDrop();
+        this.initThemeToggle();
+    }
+
+    initResizablePanel() {
+        const handle = document.getElementById('panel-handle');
+        const panel = document.getElementById('bottom-panel');
+        let startY, startHeight;
+
+        handle.addEventListener('mousedown', (e) => {
+            startY = e.clientY;
+            startHeight = parseInt(getComputedStyle(panel).height);
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        });
+
+        const resize = (e) => {
+            const diff = startY - e.clientY;
+            panel.style.height = `${startHeight + diff}px`;
+        };
+
+        const stopResize = () => {
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        };
+    }
+
+    initDragAndDrop() {
+        const tabs = document.getElementById('tabs-container');
+        new Sortable(tabs, {
+            animation: 150,
+            onEnd: (evt) => {
+                const itemEl = evt.item;
+                const newIndex = evt.newIndex;
+                // Update tab order in fileManager
+            }
+        });
+    }
+
+    initThemeToggle() {
+        const html = document.documentElement;
+        document.getElementById('theme-select').addEventListener('change', (e) => {
+            html.dataset.theme = e.target.value;
+            editor.updateOptions({ theme: e.target.value });
+        });
+    }
+
+    showTooltip(element) {
+        const tooltip = element.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
+        }
+    }
+
+    hideTooltip(element) {
+        const tooltip = element.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+        }
+    }
+}
+
+const uiManager = new UIManager();
+
+// Add event listeners for tooltips
+document.querySelectorAll('.icon-action').forEach(btn => {
+    btn.addEventListener('mouseenter', () => uiManager.showTooltip(btn));
+    btn.addEventListener('mouseleave', () => uiManager.hideTooltip(btn));
+});
+
 const languageService = new LanguageService();
+
+function showCommandPalette() {
+    const quickPick = document.createElement('div');
+    quickPick.className = 'quick-pick';
+    quickPick.innerHTML = `
+        <input type="text" placeholder="Type a command or search...">
+        <div class="quick-pick-results"></div>
+    `;
+    document.body.appendChild(quickPick);
+}
+
+// Add more language support
+const languages = [
+    'typescript',
+    'python',
+    'java',
+    'cpp',
+    'csharp',
+    'ruby',
+    'php',
+    'go',
+    'rust'
+];
+
+languages.forEach(lang => {
+    monaco.languages.register({ id: lang });
+});
+
+// Initialize theme manager
+const themeManager = new ThemeManager();

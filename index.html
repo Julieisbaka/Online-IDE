@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,19 +9,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/editor/editor.main.nls.js"></script>
+    <script src="themeManager.js"></script>
+    <script src="services/languageServer.js"></script>
+    <script src="services/lintingService.js"></script>
+    <script src="services/previewService.js"></script>
+    <script src="services/testRunner.js"></script>
+    <script src="services/debugService.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-buttons">
                 <button class="icon-btn" id="file-explorer-btn" title="File Explorer">📁</button>
                 <button class="icon-btn" id="git-btn" title="Source Control">🔄</button>
                 <button class="icon-btn" id="search-btn" title="Search">🔍</button>
                 <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+                <button class="icon-btn" id="themes-btn" title="Themes">🎨</button>
             </div>
             <div id="sidebar-content"></div>
-        </div>
-        <div class="main-content">
+        </aside>
+        <main class="main-content">
             <div class="file-management">
                 <button id="new-file">New File</button>
                 <button id="save-file">Save</button>
@@ -40,26 +48,69 @@
                 <button id="run-btn">Run</button>
                 <button id="preview-btn" style="display: none;">Toggle Preview</button>
                 <div class="toolbar-right">
-                    <button id="format-btn" title="Format Code">📄</button>
-                    <button id="fold-btn" title="Toggle Fold">⮟</button>
-                    <button id="minimap-btn" title="Toggle Minimap">◫</button>
+                    <button id="format-btn" class="icon-action" title="Format Code">
+                        <span class="icon">📄</span>
+                        <span class="tooltip">Format</span>
+                    </button>
+                    <button id="fold-btn" class="icon-action" title="Toggle Fold">
+                        <span class="icon">⮟</span>
+                        <span class="tooltip">Fold</span>
+                    </button>
+                    <button id="minimap-btn" class="icon-action" title="Toggle Minimap">
+                        <span class="icon">◫</span>
+                        <span class="tooltip">Minimap</span>
+                    </button>
+                </div>
+                <div class="debug-controls" style="display: none;">
+                    <button id="debug-start">▶</button>
+                    <button id="debug-stop">⬛</button>
+                    <button id="debug-step">⤵</button>
+                    <button id="debug-continue">↪</button>
                 </div>
             </div>
             <div class="editor-container">
                 <div id="editor"></div>
                 <div id="preview" class="preview-panel" style="display: none;"></div>
             </div>
-            <div class="bottom-panel">
+            <div class="bottom-panel" id="bottom-panel">
+                <div class="panel-handle" id="panel-handle"></div>
                 <div class="panel-tabs">
                     <button class="panel-tab active" data-target="output">Output</button>
                     <button class="panel-tab" data-target="terminal">Terminal</button>
                     <button class="panel-tab" data-target="problems">Problems</button>
+                    <button class="panel-tab" data-target="tools">Tools</button>
+                    <button class="panel-tab" data-target="api-tester">API Tester</button>
                 </div>
                 <div id="output" class="panel-content"></div>
                 <div id="terminal" class="panel-content" style="display: none;"></div>
                 <div id="problems" class="panel-content" style="display: none;"></div>
+                <div id="tools" class="panel-content" style="display: none;">
+                    <div class="tools-grid">
+                        <button data-tool="jsonFormatter">JSON Formatter</button>
+                        <button data-tool="jsonMinifier">JSON Minifier</button>
+                        <button data-tool="jsonToYaml">JSON to YAML</button>
+                        <button data-tool="base64">Base64</button>
+                        <button data-tool="sha256">SHA-256</button>
+                        <button data-tool="hexConverter">Hex Converter</button>
+                        <button data-tool="binaryConverter">Binary Converter</button>
+                    </div>
+                </div>
+                <div id="api-tester" class="panel-content" style="display: none;">
+                    <div class="api-tester-container">
+                        <select id="http-method">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <input type="text" id="api-url" placeholder="Enter URL">
+                        <textarea id="request-headers" placeholder="Headers (JSON)"></textarea>
+                        <textarea id="request-body" placeholder="Request Body"></textarea>
+                        <button id="send-request">Send</button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
     <div id="settings-modal" class="modal">
         <div class="modal-content">
@@ -81,6 +132,12 @@
                     <input type="number" id="tab-size" min="2" max="8" value="4">
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="theme-browser" class="modal">
+        <div class="modal-content">
+            <h2>Theme Browser</h2>
+            <div class="theme-grid"></div>
         </div>
     </div>
     <script src="fileManager.js"></script>

@@ -1,5 +1,19 @@
 class FileManager {
     constructor() {
+        this.fileSystem = {
+            root: {
+                type: 'folder',
+                name: 'root',
+                children: new Map(),
+                parent: null
+            }
+        };
+        this.currentPath = '/root';
+        this.supportedPreviews = {
+            'image': ['png', 'jpg', 'gif', 'svg'],
+            'pdf': ['pdf'],
+            'code': ['js', 'html', 'css', 'md', 'xml', 'json', 'yaml']
+        };
         this.files = new Map();
         this.currentFile = null;
         this.fileTree = {
@@ -36,12 +50,55 @@ class FileManager {
                 </div>`;
     }
 
-    createFile(name, content = '', language = 'javascript') {
-        const path = `/${name}`;
-        const file = { name, path, content, language };
-        this.files.set(path, file);
+    createFile(name, content = '', type = 'file') {
+        const path = this.currentPath;
+        const folder = this.getFolder(path);
+        
+        if (folder.children.has(name)) {
+            throw new Error('File already exists');
+        }
+
+        folder.children.set(name, {
+            type: type,
+            name: name,
+            content: content,
+            parent: folder,
+            created: new Date(),
+            modified: new Date()
+        });
+
         this.updateFileTree();
-        return file;
+    }
+
+    createFolder(name) {
+        this.createFile(name, '', 'folder');
+    }
+
+    deleteItem(path) {
+        const { parent, name } = this.parsePath(path);
+        const folder = this.getFolder(parent);
+        folder.children.delete(name);
+        this.updateFileTree();
+    }
+
+    async importFile(file) {
+        const content = await this.readFile(file);
+        const preview = await this.generatePreview(file, content);
+        this.createFile(file.name, { content, preview });
+    }
+
+    async generatePreview(file, content) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        
+        if (this.supportedPreviews.image.includes(ext)) {
+            return `<img src="${URL.createObjectURL(file)}" alt="${file.name}">`;
+        }
+
+        if (this.supportedPreviews.pdf.includes(ext)) {
+            return `<iframe src="${URL.createObjectURL(file)}" width="100%" height="100%"></iframe>`;
+        }
+
+        return content;
     }
 
     updateFileTree() {
