@@ -50,6 +50,8 @@ body {
     width: 100%;
     min-height: 300px;
     border: none;
+    flex: 1;
+    min-height: 0;
 }
 
 .monaco-editor {
@@ -109,6 +111,11 @@ body {
     height: calc(100vh - 120px);
     position: relative;
     background: var(--primary-bg);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 }
 
 .preview-panel {
@@ -428,4 +435,73 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 4px;
+    background: var(--secondary-bg);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background: var(--accent-color);
+    animation: loading 1s infinite ease-in-out;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
+
+.command-palette {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+.command-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.command-results {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.command-item {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.command-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.command-item .shortcut {
+    margin-left: auto;
+    opacity: 0.7;
 }

@@ -11,12 +11,51 @@ class IDEController {
         this.themeManager = new ThemeManager();
         this.toolsService = new ToolsService();
         this.apiTester = new APITester();
+        this.shortcuts = new Map();
+        this.setupShortcuts();
+    }
+
+    setupShortcuts() {
+        this.shortcuts.set('ctrl+s', () => this.fileManager.saveCurrentFile());
+        this.shortcuts.set('ctrl+b', () => this.toggleSidebar());
+        this.shortcuts.set('ctrl+`', () => this.toggleTerminal());
+        this.shortcuts.set('ctrl+shift+p', () => this.showCommandPalette());
+        this.shortcuts.set('ctrl+/', () => this.toggleComment());
+        this.shortcuts.set('alt+up', () => this.moveLine('up'));
+        this.shortcuts.set('alt+down', () => this.moveLine('down'));
     }
 
     async init() {
-        await this.initEditor();
-        this.initEventListeners();
-        this.setupPanels();
+        try {
+            await this.loadMonaco();
+            await this.initEditor();
+            await this.initServices();
+            this.hideLoader();
+        } catch (error) {
+            this.handleInitError(error);
+        }
+    }
+
+    hideLoader() {
+        document.getElementById('loader').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+        }, 500);
+    }
+
+    handleInitError(error) {
+        console.error('IDE initialization failed:', error);
+        document.getElementById('loader').innerHTML = `
+            <div class="loader-content error">
+                <h2>Failed to load IDE</h2>
+                <p>${error.message}</p>
+                <button onclick="location.reload()">Retry</button>
+            </div>
+        `;
+    }
+
+    async loadMonaco() {
+        await new Promise(resolve => require(['vs/editor/editor.main'], resolve));
     }
 
     async initEditor() {
@@ -63,6 +102,14 @@ class IDEController {
         if (window.languageServer) {
             window.languageServer.initializeProviders();
         }
+    }
+
+    async initServices() {
+        // Initialize services
+        await this.fileManager.init();
+        await this.themeManager.init();
+        await this.toolsService.init();
+        await this.apiTester.init();
     }
 
     initEventListeners() {
