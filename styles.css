@@ -187,3 +187,67 @@ body {
     border: 1px solid #555;
     color: #fff;
 }
+
+.file-item, .folder-header {
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.file-item:hover, .folder-header:hover {
+    background: #383838;
+}
+
+.folder-content {
+    padding-left: 15px;
+}
+
+.problem-item {
+    padding: 5px 10px;
+    border-bottom: 1px solid #383838;
+    display: flex;
+    gap: 10px;
+}
+
+.problem-severity {
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.problem-item.error .problem-severity {
+    background: #ff4444;
+}
+
+.problem-item.warning .problem-severity {
+    background: #ffaa00;
+}
+
+.editor-container {
+    display: flex;
+    flex: 1;
+}
+
+.preview-panel {
+    flex: 1;
+    padding: 20px;
+    background: #fff;
+    color: #000;
+}
+
+/* Add responsive design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+    
+    .sidebar-buttons {
+        flex-direction: row;
+    }
+}

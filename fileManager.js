@@ -1,7 +1,58 @@
 class FileManager {
     constructor() {
-        this.tabs = new Map();
-        this.activeTab = null;
+        this.files = new Map();
+        this.currentFile = null;
+        this.fileTree = {
+            name: 'root',
+            type: 'folder',
+            children: []
+        };
+        this.init();
+    }
+
+    init() {
+        document.getElementById('file-explorer-btn').addEventListener('click', () => this.toggleFileExplorer());
+        // ...existing event listeners...
+    }
+
+    toggleFileExplorer() {
+        const content = document.getElementById('sidebar-content');
+        content.innerHTML = this.renderFileTree(this.fileTree);
+    }
+
+    renderFileTree(node) {
+        if (node.type === 'file') {
+            return `<div class="file-item" onclick="fileManager.openFile('${node.path}')">
+                     <span class="file-icon">📄</span>${node.name}
+                   </div>`;
+        }
+
+        const children = node.children.map(child => this.renderFileTree(child)).join('');
+        return `<div class="folder">
+                  <div class="folder-header">
+                    <span class="folder-icon">📁</span>${node.name}
+                  </div>
+                  <div class="folder-content">${children}</div>
+                </div>`;
+    }
+
+    createFile(name, content = '', language = 'javascript') {
+        const path = `/${name}`;
+        const file = { name, path, content, language };
+        this.files.set(path, file);
+        this.updateFileTree();
+        return file;
+    }
+
+    updateFileTree() {
+        this.fileTree.children = Array.from(this.files.values()).map(file => ({
+            name: file.name,
+            type: 'file',
+            path: file.path
+        }));
+        if (document.getElementById('sidebar-content').classList.contains('file-explorer')) {
+            this.toggleFileExplorer();
+        }
     }
 
     createTab(filename = 'untitled', content = '', language = 'javascript') {

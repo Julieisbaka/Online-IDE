@@ -25,7 +25,13 @@ require(['vs/editor/editor.main'], function() {
         folding: true,
         contextmenu: true,
         mouseWheelZoom: true,
-        padding: { top: 10 }
+        padding: { top: 10 },
+        autoIndent: 'full',
+        dragAndDrop: true,
+        links: true,
+        parameterHints: { enabled: true },
+        showUnused: true,
+        tabCompletion: 'on'
     });
 
     // Add code snippets
@@ -39,7 +45,12 @@ require(['vs/editor/editor.main'], function() {
                         insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {\n\t${3}\n}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
                     },
-                    // Add more snippets here
+                    {
+                        label: 'class',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: 'class ${1:name} {\n\tconstructor() {\n\t\t$0\n\t}\n}',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                    }
                 ]
             };
         }
@@ -170,19 +181,8 @@ async function executeCode() {
             throw new Error('Potentially unsafe code detected');
         }
 
-        switch (language) {
-            case 'javascript':
-                await executeJavaScript(code, output);
-                break;
-            case 'python':
-                await executePython(code, output);
-                break;
-            case 'java':
-                await executeJava(code, output);
-                break;
-            default:
-                throw new Error('Unsupported language');
-        }
+        const result = await languageService.executeCode(code, language);
+        output.innerHTML = escapeHtml(String(result));
     } catch (error) {
         output.innerHTML = `<span class="error">Error: ${escapeHtml(error.message)}</span>`;
     }
@@ -283,3 +283,58 @@ function updatePreview() {
         iframeDoc.close();
     }
 }
+
+class LanguageService {
+    constructor() {
+        this.problems = new Map();
+        this.supportedLanguages = {
+            javascript: {
+                compile: code => this.validateJS(code),
+                run: code => this.executeJS(code)
+            },
+            python: {
+                compile: code => this.validatePython(code),
+                run: code => this.executePython(code)
+            }
+        };
+    }
+
+    async executeCode(code, language) {
+        const runner = this.supportedLanguages[language];
+        if (!runner) throw new Error('Language not supported');
+
+        const problems = await runner.compile(code);
+        this.updateProblems(problems);
+        
+        if (problems.length === 0) {
+            return await runner.run(code);
+        }
+        throw new Error('Please fix compilation errors');
+    }
+
+    updateProblems(problems) {
+        const panel = document.getElementById('problems');
+        panel.innerHTML = problems.map(p => `
+            <div class="problem-item ${p.severity}">
+                <span class="problem-severity">${p.severity}</span>
+                <span class="problem-message">${p.message}</span>
+                <span class="problem-location">Line ${p.line}</span>
+            </div>
+        `).join('');
+    }
+
+    validateJS(code) {
+        try {
+            new Function(code);
+            return [];
+        } catch (e) {
+            return [{
+                severity: 'error',
+                message: e.message,
+                line: this.extractLineNumber(e)
+            }];
+        }
+    }
+}
+
+const languageService = new LanguageService();
