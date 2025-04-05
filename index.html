@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online IDE</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="file-management">
+            <button id="new-file">New File</button>
+            <button id="save-file">Save</button>
+            <input type="file" id="file-input" accept=".js,.py,.java,.txt" style="display: none">
+            <button id="open-file">Open File</button>
+        </div>
+        <div id="tabs-container"></div>
+        <div class="toolbar">
+            <select id="language-select">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="markdown">Markdown</option>
+                <option value="html">HTML</option>
+            </select>
+            <button id="run-btn">Run</button>
+            <button id="preview-btn" style="display: none;">Toggle Preview</button>
+        </div>
+        <div class="editor-container">
+            <div id="editor"></div>
+            <div id="preview" class="preview-panel" style="display: none;"></div>
+        </div>
+        <div id="output"></div>
+    </div>
+    <script src="fileManager.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

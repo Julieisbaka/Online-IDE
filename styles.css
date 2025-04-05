@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #1e1e1e;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.toolbar {
+    padding: 10px;
+    background-color: #2d2d2d;
+}
+
+#language-select, #run-btn {
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
+#editor {
+    flex: 1;
+    border: 1px solid #333;
+}
+
+#output {
+    height: 150px;
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 10px;
+    font-family: monospace;
+    overflow-y: auto;
+}
+
+.file-management {
+    padding: 10px;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #404040;
+}
+
+.file-management button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    background: #404040;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#tabs-container {
+    display: flex;
+    background-color: #2d2d2d;
+    padding: 5px 5px 0 5px;
+}
+
+.tab {
+    padding: 5px 15px;
+    background: #404040;
+    margin-right: 5px;
+    cursor: pointer;
+    border-radius: 3px 3px 0 0;
+    color: white;
+}
+
+.tab.active {
+    background: #1e1e1e;
+}
+
+.error {
+    color: #ff6b6b;
+}
+
+.editor-container {
+    display: flex;
+    flex: 1;
+    position: relative;
+}
+
+.preview-panel {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    overflow: auto;
+    border-left: 1px solid #404040;
+}
+
+.preview-panel.visible {
+    display: block !important;
+}
+
+/* Markdown styling */
+.preview-panel h1 { font-size: 2em; margin: 0.67em 0; }
+.preview-panel h2 { font-size: 1.5em; margin: 0.75em 0; }
+.preview-panel h3 { font-size: 1.17em; margin: 0.83em 0; }
+.preview-panel code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
+.preview-panel pre { background: #f4f4f4; padding: 15px; border-radius: 5px; }
